@@ -1,6 +1,8 @@
 package ar.com.ada.hoteltresvagos;
 
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
@@ -21,7 +23,7 @@ public class ABM {
 
         try {
 
-            ABMHuesped.setup();
+            ABMHuesped.setup(); //del huespedManager
 
             printOpciones();
 
@@ -31,7 +33,7 @@ public class ABM {
             while (opcion > 0) {
 
                 switch (opcion) {
-                    case 1:
+                    case 1: // hacer reserva= crear huesped y reserva
 
                         try {
                             alta();
@@ -40,20 +42,13 @@ public class ABM {
                         }
                         break;
 
-                    case 2:
-                        baja();
+                    case 2: // modificar = reserva y huesped
+                    modifica();    
+                    baja();
                         break;
 
-                    case 3:
-                        modifica();
-                        break;
-
-                    case 4:
-                        listar();
-                        break;
-
-                    case 5:
-                        listarPorNombre();
+                    case 3: // consultar reserva o huesped
+                    listar(); 
                         break;
 
                     default:
@@ -83,22 +78,52 @@ public class ABM {
 
     public void alta() throws Exception {
         Huesped huesped = new Huesped();
-        System.out.println("Ingrese el nombre:");
+
+        System.out.println("INGRESE DATOS PERSONALES");
+        System.out.println("Apellido y Nombres:");
         huesped.setNombre(Teclado.nextLine());
-        System.out.println("Ingrese el DNI:");
+        System.out.println("DNI:");
         huesped.setDni(Teclado.nextInt());
-        Teclado.nextLine();
-        System.out.println("Ingrese la domicilio:");
+        Teclado.nextLine(); //chupa el enter
+        System.out.println("Domicilio:");
         huesped.setDomicilio(Teclado.nextLine());
-
-        System.out.println("Ingrese el Domicilio alternativo(OPCIONAL):");
-
+        System.out.println("Domicilio alternativo(OPCIONAL):");
         String domAlternativo = Teclado.nextLine();
-
         if (domAlternativo != null)
-            huesped.setDomicilioAlternativo(domAlternativo);
+            huesped.setDomicilioAlternativo(domAlternativo);      
+
+        // Si creamos un Huesped le creamos una reserva
+        Reserva reserva = new Reserva();
+
+        reserva.setFechaReserva(new Date()); //Fecha actual
+
+        System.out.println("Ingrese la fecha de ingreso(DD/MM/AA)");
+        String fechaString = Teclado.nextLine();
+        Date fechaDate = validarFecha(fechaString);
+        reserva.setFechaIngreso(fechaDate);
+
+        System.out.println("Ingrese la fecha de salida(DD/MM/AA)");
+        fechaString = (Teclado.nextLine());
+        fechaDate = validarFecha(fechaString);
+        reserva.setFechaEgreso(fechaDate);
+        
+        //PAGOS
+        BigDecimal importeReserva = new BigDecimal(Math.floor(Math.random()*(10000-1000+1)+1000));
+        reserva.setImporteReserva(importeReserva);
+        System.out.println("El valor de su reserva es: "+ importeReserva);
+        System.out.println("¿Cuanto desea abonar ahora para efectivizar su reserva?");
+        reserva.setImportePagado(new BigDecimal(Teclado.nextLine()));
+        BigDecimal gastosExtra = new BigDecimal(2500);
+        reserva.setImporteTotal(importeReserva.add(gastosExtra));
+        reserva.setTipoEstadoPagoId(10);
+
+        reserva.setHuesped(huesped); //Esta es la relacion bidireccional
+        
+      
 
         
+        //Actualizo todos los objeto
+
         ABMHuesped.create(huesped);
 
         /*
@@ -248,13 +273,31 @@ public class ABM {
     public static void printOpciones() {
         System.out.println("=======================================");
         System.out.println("");
-        System.out.println("1. Para agregar un huesped.");
-        System.out.println("2. Para eliminar un huesped.");
-        System.out.println("3. Para modificar un huesped.");
-        System.out.println("4. Para ver el listado.");
-        System.out.println("5. Buscar un huesped por nombre especifico(SQL Injection)).");
+        System.out.println("1. CREAR RESERVA");
+        System.out.println("2. MODIFICAR RESERVA");
+        System.out.println("3. CONSULTAR RESERVA");
         System.out.println("0. Para terminar.");
         System.out.println("");
         System.out.println("=======================================");
+    }
+
+    public Date validarFecha(String f){
+    boolean fechaIncorrecta = true;
+    Date fecha = null;
+    while (fechaIncorrecta) {       
+        try{
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yy");
+            fecha = simpleDateFormat.parse(f);
+            fechaIncorrecta = false;
+
+        } catch(Exception ex){
+            System.out.println("Error. Ingrese una fecha valida en formato DD-MM-AA ");
+            f= Teclado.nextLine();
+            
+        }
+        
+    }
+    return fecha;
+
     }
 }

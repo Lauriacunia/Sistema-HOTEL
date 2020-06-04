@@ -14,22 +14,26 @@ import ar.com.ada.hoteltresvagos.excepciones.*;
 public class Huesped {
     @Id
     @Column(name = "huesped_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // aviso que huespedId es autoINCREMENTAL
     private int huespedId;
-    private String nombre;
+    private String nombre; //si se llama igual a la tabla no hace falta el @Column
     @NaturalId
     private int dni;
     private String domicilio;
     @Column(name = "domicilio_alternativo")
     private String domicilioAlternativo;
 
+    @OneToMany(mappedBy = "huesped", cascade = CascadeType.ALL) // un huesped puede tener muchas reservas
+    List <Reserva> reservas = new ArrayList<>();
+
+    //CONTRUCTORES
+
     public Huesped(String nombre) {
-        this.nombre = nombre;
+        this.nombre = nombre;}
 
-    }
+    public Huesped() {}
 
-    public Huesped() {
-    }
+    //GETTERS AND SETTERS 
 
     public int getHuespedId() {
         return huespedId;
@@ -44,7 +48,7 @@ public class Huesped {
     }
 
     public void setNombre(String nombre) {
-        this.nombre = nombre;
+        this.nombre = nombre; 
     }
 
     public void setDni(int dni) throws HuespedDNIException {
@@ -61,25 +65,33 @@ public class Huesped {
         return dni;
     }
 
-    @Override
-    public String toString() {
-        return "Huesped [dni=" + dni + ", nombre=" + nombre + "]";
-    }
-
     public String getDomicilio() {
         return domicilio;
     }
 
     public void setDomicilio(String domicilio) {
-        this.domicilio = domicilio;
+        this.domicilio = domicilio; 
     }
 
     public String getDomicilioAlternativo() {
-        return domicilioAlternativo;
+        return domicilioAlternativo; 
     }
 
     public void setDomicilioAlternativo(String domicilioAlternativo) {
-        this.domicilioAlternativo = domicilioAlternativo;
+        this.domicilioAlternativo = domicilioAlternativo; 
+    }
+
+    public List<Reserva> getReservas() {
+        return reservas; 
+    }
+
+    public void setReservas(List<Reserva> reservas) {
+        this.reservas = reservas;
+    }
+
+     @Override
+    public String toString() {
+        return "Huesped [dni=" + dni + ", nombre=" + nombre + "]";
     }
 
 }
